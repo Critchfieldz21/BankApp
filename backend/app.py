@@ -250,6 +250,8 @@ def serve_react(path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, 'index.html')
+
+if __name__ == '__main__':
     print('\n' + '='*60)
     print('🏦 Four Cs Bank Backend Server')
     print('='*60)
