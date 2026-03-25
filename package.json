@@ -1,0 +1,22 @@
+{
+  "name": "four-cs-bank",
+  "version": "1.0.0",
+  "description": "A banking application with React frontend and Flask backend",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"cd frontend && npm start\" \"cd backend && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && python3 app.py\"",
+    "frontend": "cd frontend && npm start",
+    "backend": "cd backend && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && python3 app.py",
+    "build": "cd frontend && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/four-cs-bank.git"
+  },
+  "keywords": ["banking", "react", "flask", "fintech"],
+  "author": "",
+  "license": "MIT"
+}
