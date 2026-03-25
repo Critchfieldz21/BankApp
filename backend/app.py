@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,7 +7,8 @@ import os
 import signal
 import sys
 
-app = Flask(__name__)
+# Serve static frontend files
+app = Flask(__name__, static_folder='../frontend/build', static_url_path='')
 CORS(app)
 
 # Graceful shutdown handler
@@ -236,7 +237,19 @@ def reset_password():
 def health():
     return jsonify({'status': 'ok'}), 200
 
-if __name__ == '__main__':
+# Serve React app for any non-API routes
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react(path):
+    # If it's an API route, it will be handled above
+    if path.startswith('api/'):
+        return jsonify({'error': 'Not found'}), 404
+    
+    # For all other routes, serve the React app
+    if path != '' and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
     print('\n' + '='*60)
     print('🏦 Four Cs Bank Backend Server')
     print('='*60)
