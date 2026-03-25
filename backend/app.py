@@ -18,10 +18,20 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 # Database Configuration
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "fourcs_bank.db")}'
+# Support both SQLite (local) and PostgreSQL (Railway)
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    # Railway/Production: PostgreSQL
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Local Development: SQLite
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "fourcs_bank.db")}'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production')
 
 db = SQLAlchemy(app)
 
@@ -224,7 +234,19 @@ def reset_password():
 
 @app.route('/api/health', methods=['GET'])
 def health():
-    return jsonify({'status': 'Backend is running'}), 200
+    try:
+        # Test database connection
+        db.session.execute('SELECT 1')
+        db.session.commit()
+        return jsonify({
+            'status': 'Backend is running',
+            'database': 'connected'
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'Backend running but database error',
+            'error': str(e)
+        }), 503
 
 if __name__ == '__main__':
     print('\n' + '='*60)
@@ -233,4 +255,14 @@ if __name__ == '__main__':
     print('✅ Running on http://127.0.0.1:5000')
     print('⏹️  Press CTRL+C to shutdown')
     print('='*60 + '\n')
+    with app.app_context():
+        db.create_all()
+        print('✅ Database tables created/verified')
     app.run(debug=True, port=5000)
+else:
+    # For gunicorn/production
+    with app.app_context():
+        try:
+            db.create_all()
+        except Exception as e:
+            print(f'⚠️  Database initialization: {e}')
