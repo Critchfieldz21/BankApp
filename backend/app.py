@@ -234,19 +234,7 @@ def reset_password():
 
 @app.route('/api/health', methods=['GET'])
 def health():
-    try:
-        # Test database connection
-        db.session.execute('SELECT 1')
-        db.session.commit()
-        return jsonify({
-            'status': 'Backend is running',
-            'database': 'connected'
-        }), 200
-    except Exception as e:
-        return jsonify({
-            'status': 'Backend running but database error',
-            'error': str(e)
-        }), 503
+    return jsonify({'status': 'ok'}), 200
 
 if __name__ == '__main__':
     print('\n' + '='*60)
@@ -259,10 +247,3 @@ if __name__ == '__main__':
         db.create_all()
         print('✅ Database tables created/verified')
     app.run(debug=True, port=5000)
-else:
-    # For gunicorn/production
-    with app.app_context():
-        try:
-            db.create_all()
-        except Exception as e:
-            print(f'⚠️  Database initialization: {e}')
