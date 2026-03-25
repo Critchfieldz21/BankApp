@@ -5,18 +5,39 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"cd frontend && npm start\" \"cd backend && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && python3 app.py\"",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:backend": "cd backend && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && python3 app.py",
     "frontend": "cd frontend && npm start",
     "backend": "cd backend && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && python3 app.py",
-    "build": "cd frontend && npm install && npm run build"
+    "build": "cd frontend && npm install && npm run build",
+    "build:frontend": "cd frontend && npm install && npm run build",
+    "start:frontend": "cd frontend && npm start",
+    "test:frontend": "cd frontend && npm test",
+    "lint:frontend": "cd frontend && npm run lint 2>/dev/null || echo 'No lint script'",
+    "clean": "rm -rf frontend/node_modules frontend/build backend/venv && find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/four-cs-bank.git"
+    "url": "https://github.com/Critchfieldz21/four-cs-bank.git"
   },
-  "keywords": ["banking", "react", "flask", "fintech"],
-  "author": "",
-  "license": "MIT"
+  "homepage": "https://github.com/Critchfieldz21/four-cs-bank",
+  "bugs": {
+    "url": "https://github.com/Critchfieldz21/four-cs-bank/issues"
+  },
+  "keywords": [
+    "banking",
+    "react",
+    "flask",
+    "fintech",
+    "web-app"
+  ],
+  "author": "Zachary Critchfield",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
 }
