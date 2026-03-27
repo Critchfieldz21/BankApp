@@ -237,6 +237,44 @@ def reset_password():
 def health():
     return jsonify({'status': 'ok'}), 200
 
+@app.route('/api/admin/users', methods=['GET'])
+def get_all_users():
+    """Get all users - Admin only"""
+    # Get username from query parameter to verify admin
+    username = request.args.get('username')
+    
+    if not username or username != 'admin':
+        return jsonify({'error': 'Unauthorized - Admin access required'}), 403
+    
+    users = User.query.all()
+    
+    return jsonify({
+        'total_users': len(users),
+        'users': [user.to_dict() for user in users]
+    }), 200
+
+@app.route('/api/admin/stats', methods=['GET'])
+def get_admin_stats():
+    """Get admin statistics - Admin only"""
+    # Get username from query parameter to verify admin
+    username = request.args.get('username')
+    
+    if not username or username != 'admin':
+        return jsonify({'error': 'Unauthorized - Admin access required'}), 403
+    
+    users = User.query.all()
+    total_users = len(users)
+    total_balance = sum(user.balance for user in users)
+    total_transactions = Transaction.query.count()
+    avg_balance = total_balance / total_users if total_users > 0 else 0
+    
+    return jsonify({
+        'total_users': total_users,
+        'total_balance': total_balance,
+        'average_balance': avg_balance,
+        'total_transactions': total_transactions
+    }), 200
+
 # Serve React app for any non-API routes
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
